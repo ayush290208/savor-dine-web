@@ -24,10 +24,20 @@ interface MenuItem {
   available: boolean;
 }
 
+// Define a type for new menu items with required fields matching the database requirements
+interface NewMenuItem {
+  name: string;
+  description?: string;
+  price: number;
+  category: string;
+  image_url?: string;
+  available: boolean;
+}
+
 const AdminMenu = () => {
   const [items, setItems] = useState<MenuItem[]>([]);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
-  const [newItem, setNewItem] = useState<Partial<MenuItem>>({
+  const [newItem, setNewItem] = useState<NewMenuItem>({
     name: '',
     description: '',
     price: 0,
@@ -74,6 +84,16 @@ const AdminMenu = () => {
   };
 
   const handleAddItem = async () => {
+    // Validate required fields
+    if (!newItem.name || !newItem.category || newItem.price <= 0) {
+      toast({
+        title: "Validation Error",
+        description: "Name, category are required and price must be greater than 0",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const { error } = await supabase
       .from('menu_items')
       .insert([newItem]);
@@ -174,7 +194,7 @@ const AdminMenu = () => {
           />
           <Textarea
             placeholder="Description"
-            value={newItem.description}
+            value={newItem.description || ''}
             onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
             className="col-span-2"
           />
@@ -247,12 +267,12 @@ const AdminMenu = () => {
             />
             <Input
               placeholder="Image URL"
-              value={editingItem.image_url}
+              value={editingItem.image_url || ''}
               onChange={(e) => setEditingItem({ ...editingItem, image_url: e.target.value })}
             />
             <Textarea
               placeholder="Description"
-              value={editingItem.description}
+              value={editingItem.description || ''}
               onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
             />
             <div className="flex justify-end space-x-2">
