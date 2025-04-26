@@ -3,30 +3,44 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
-import { Facebook, Instagram, PhoneCall, ShoppingCart } from "lucide-react";
+import { Facebook, Instagram, PhoneCall, ShoppingCart, LogIn } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email) {
+  const handleQuickAdminLogin = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: 'mrvirenderrai692@gmail.com',
+        password: 'ayush000#'
+      });
+
+      if (error) {
+        toast({
+          title: "Login Failed",
+          description: error.message,
+          variant: "destructive"
+        });
+        return;
+      }
+
       toast({
-        title: "Email is required",
-        description: "Please enter your email address.",
+        title: "Admin Login Successful",
+        description: "Redirecting to admin dashboard",
+      });
+
+      navigate('/admin');
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "An unexpected error occurred",
         variant: "destructive"
       });
-      return;
     }
-    
-    toast({
-      title: "Thank you for subscribing!",
-      description: "You'll receive our newsletters with exclusive offers.",
-    });
-    
-    setEmail("");
   };
 
   const currentYear = new Date().getFullYear();
@@ -105,12 +119,20 @@ const Footer = () => {
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm mb-4 md:mb-0">
-              &copy; {currentYear} SavorDine. All rights reserved.
+              &copy; {new Date().getFullYear()} SavorDine. All rights reserved.
             </p>
             <div className="flex space-x-6 text-sm text-gray-400">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
               <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleQuickAdminLogin} 
+                className="text-gray-400 hover:text-white"
+              >
+                <LogIn className="mr-2 h-4 w-4" /> Quick Admin Login
+              </Button>
             </div>
           </div>
         </div>
