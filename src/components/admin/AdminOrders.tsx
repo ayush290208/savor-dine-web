@@ -11,6 +11,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
 
 interface Order {
   id: string;
@@ -22,10 +25,15 @@ interface Order {
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [webhookUrl, setWebhookUrl] = useState('');
+  const [notificationSound] = useState(new Audio('/notification.mp3'));
 
   useEffect(() => {
     fetchOrders();
-    subscribeToOrders();
+    const subscription = setupRealtimeSubscription();
+    return () => {
+      supabase.removeChannel(subscription);
+    };
   }, []);
 
   const fetchOrders = async () => {
@@ -46,19 +54,44 @@ const AdminOrders = () => {
     setOrders(data);
   };
 
-  const subscribeToOrders = () => {
-    const channel = supabase
+  const setupRealtimeSubscription = () => {
+    return supabase
       .channel('orders-changes')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'orders' },
-        () => fetchOrders()
+        { event: 'INSERT', schema: 'public', table: 'orders' },
+        async (payload) => {
+          // Play notification sound
+          notificationSound.play().catch(console.error);
+          
+          // Show toast notification
+          toast({
+            title: "New Order!",
+            description: `New order from ${payload.new.customer_name}`,
+          });
+
+          // Trigger webhook if URL is set
+          if (webhookUrl) {
+            try {
+              await fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                mode: 'no-cors',
+                body: JSON.stringify({
+                  event: 'new_order',
+                  order: payload.new
+                })
+              });
+            } catch (error) {
+              console.error('Failed to trigger webhook:', error);
+            }
+          }
+
+          // Update orders list
+          fetchOrders();
+        }
       )
       .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   };
 
   const updateOrderStatus = async (orderId: string, status: string) => {
@@ -84,7 +117,26 @@ const AdminOrders = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Orders</h2>
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Orders</h2>
+        
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Notifications</AlertTitle>
+          <AlertDescription>
+            Enter a webhook URL below to receive notifications for new orders. You can use services like Zapier to send SMS or emails.
+          </AlertDescription>
+        </Alert>
+
+        <Input
+          type="url"
+          placeholder="Enter webhook URL for notifications (optional)"
+          value={webhookUrl}
+          onChange={(e) => setWebhookUrl(e.target.value)}
+          className="max-w-xl"
+        />
+      </div>
+
       <Table>
         <TableHeader>
           <TableRow>
