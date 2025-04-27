@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -21,6 +20,17 @@ interface MenuItem {
   image: string;
   category: string;
   quantity?: number;
+}
+
+interface SettingsData {
+  id?: string;
+  key: string;
+  value: string;
+}
+
+interface StripeSettings {
+  enabled: boolean;
+  publishableKey: string;
 }
 
 const menuItems: MenuItem[] = [
@@ -50,11 +60,6 @@ const menuItems: MenuItem[] = [
   }
 ];
 
-interface StripeSettings {
-  enabled: boolean;
-  publishableKey: string;
-}
-
 const OrderPage = () => {
   const navigate = useNavigate();
   const [cart, setCart] = useState<MenuItem[]>([]);
@@ -70,23 +75,23 @@ const OrderPage = () => {
   const [loading, setLoading] = useState(false);
   const [stripeInfo, setStripeInfo] = useState<StripeSettings | null>(null);
 
-  // Define the fetchStripeSettings function before using it
   const fetchStripeSettings = async () => {
     try {
       const { data, error } = await supabase
         .from('settings')
         .select('*')
         .eq('key', 'stripe_settings')
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching Stripe settings:', error);
         return;
       }
 
-      if (data && data.value) {
+      if (data) {
+        const typedData = data as SettingsData;
         try {
-          const settings = JSON.parse(data.value);
+          const settings = JSON.parse(typedData.value);
           setStripeInfo({
             enabled: settings.enabled || false,
             publishableKey: settings.publishableKey || ''
@@ -104,7 +109,6 @@ const OrderPage = () => {
     }
   };
 
-  // Use useEffect instead of useState for running the function
   useEffect(() => {
     fetchStripeSettings();
   }, []);

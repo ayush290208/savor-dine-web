@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -16,7 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 // Define a type for settings data
 interface SettingsData {
-  id: string;
+  id?: string;
   key: string;
   value: string;
 }
@@ -44,20 +43,20 @@ const AdminStripeSettings = () => {
   // Load saved settings when component mounts
   const fetchStripeSettings = async () => {
     try {
-      // Use custom type to handle the settings table
+      // Use type assertion to match the settings table structure
       const { data, error } = await supabase
         .from('settings')
         .select('*')
         .eq('key', 'stripe_settings')
-        .single();
+        .maybeSingle();
         
       if (error) {
-        // If no record exists, it's fine
+        console.error('Error fetching settings:', error);
         return;
       }
 
       if (data) {
-        const typedData = data as unknown as SettingsData;
+        const typedData = data as SettingsData;
         if (typedData.value) {
           try {
             const settings = JSON.parse(typedData.value);
@@ -90,13 +89,14 @@ const AdminStripeSettings = () => {
         updatedAt: new Date().toISOString()
       };
 
-      // Save to database using upsert
+      // Upsert to settings table with correct key
       const { error } = await supabase
         .from('settings')
         .upsert({ 
           key: 'stripe_settings', 
           value: JSON.stringify(stripeSettings) 
-        });
+        })
+        .select();
 
       if (error) {
         throw error;
