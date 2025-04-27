@@ -1,18 +1,25 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { CreditCard, Settings, DollarSign } from 'lucide-react';
+import { CreditCard, DollarSign } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+
+// Define a type for settings data
+interface SettingsData {
+  id: string;
+  key: string;
+  value: string;
+}
 
 // Form validation schema
 const formSchema = z.object({
@@ -37,23 +44,31 @@ const AdminStripeSettings = () => {
   // Load saved settings when component mounts
   const fetchStripeSettings = async () => {
     try {
+      // Use custom type to handle the settings table
       const { data, error } = await supabase
         .from('settings')
         .select('*')
         .eq('key', 'stripe_settings')
         .single();
-
+        
       if (error) {
         // If no record exists, it's fine
         return;
       }
 
-      if (data && data.value) {
-        const settings = JSON.parse(data.value);
-        form.setValue('stripePublishableKey', settings.publishableKey || '');
-        form.setValue('stripeEnabled', settings.enabled || false);
-        form.setValue('testMode', settings.testMode || true);
-        setStripeConnected(!!settings.publishableKey);
+      if (data) {
+        const typedData = data as unknown as SettingsData;
+        if (typedData.value) {
+          try {
+            const settings = JSON.parse(typedData.value);
+            form.setValue('stripePublishableKey', settings.publishableKey || '');
+            form.setValue('stripeEnabled', settings.enabled || false);
+            form.setValue('testMode', settings.testMode || true);
+            setStripeConnected(!!settings.publishableKey);
+          } catch (parseError) {
+            console.error('Error parsing Stripe settings:', parseError);
+          }
+        }
       }
     } catch (error) {
       console.error('Error loading Stripe settings:', error);
@@ -61,9 +76,9 @@ const AdminStripeSettings = () => {
   };
 
   // Call fetchStripeSettings when the component mounts
-  useState(() => {
+  useEffect(() => {
     fetchStripeSettings();
-  });
+  }, []);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
@@ -75,13 +90,13 @@ const AdminStripeSettings = () => {
         updatedAt: new Date().toISOString()
       };
 
-      // Save to database
+      // Save to database using upsert
       const { error } = await supabase
         .from('settings')
         .upsert({ 
           key: 'stripe_settings', 
           value: JSON.stringify(stripeSettings) 
-        }, { onConflict: 'key' });
+        });
 
       if (error) {
         throw error;

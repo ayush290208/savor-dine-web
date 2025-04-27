@@ -1,4 +1,5 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -49,6 +50,11 @@ const menuItems: MenuItem[] = [
   }
 ];
 
+interface StripeSettings {
+  enabled: boolean;
+  publishableKey: string;
+}
+
 const OrderPage = () => {
   const navigate = useNavigate();
   const [cart, setCart] = useState<MenuItem[]>([]);
@@ -62,12 +68,9 @@ const OrderPage = () => {
   const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'cash'>('stripe');
   const [loading, setLoading] = useState(false);
-  const [stripeInfo, setStripeInfo] = useState<{enabled: boolean, publishableKey: string} | null>(null);
+  const [stripeInfo, setStripeInfo] = useState<StripeSettings | null>(null);
 
-  useState(() => {
-    fetchStripeSettings();
-  });
-
+  // Define the fetchStripeSettings function before using it
   const fetchStripeSettings = async () => {
     try {
       const { data, error } = await supabase
@@ -82,20 +85,29 @@ const OrderPage = () => {
       }
 
       if (data && data.value) {
-        const settings = JSON.parse(data.value);
-        setStripeInfo({
-          enabled: settings.enabled || false,
-          publishableKey: settings.publishableKey || ''
-        });
-        
-        if (!settings.enabled) {
-          setPaymentMethod('cash');
+        try {
+          const settings = JSON.parse(data.value);
+          setStripeInfo({
+            enabled: settings.enabled || false,
+            publishableKey: settings.publishableKey || ''
+          });
+          
+          if (!settings.enabled) {
+            setPaymentMethod('cash');
+          }
+        } catch (parseError) {
+          console.error('Error parsing Stripe settings:', parseError);
         }
       }
     } catch (error) {
       console.error('Error processing Stripe settings:', error);
     }
   };
+
+  // Use useEffect instead of useState for running the function
+  useEffect(() => {
+    fetchStripeSettings();
+  }, []);
 
   const addToCart = (item: MenuItem) => {
     const itemInCart = cart.find(cartItem => cartItem.id === item.id);
