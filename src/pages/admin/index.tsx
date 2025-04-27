@@ -7,10 +7,11 @@ import { Home } from 'lucide-react';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminOrders from '@/components/admin/AdminOrders';
 import AdminMenu from '@/components/admin/AdminMenu';
+import AdminStripeSettings from '@/components/admin/AdminStripeSettings';
 import { toast } from '@/components/ui/use-toast';
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'orders' | 'menu'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'stripe'>('orders');
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -57,7 +58,9 @@ const AdminDashboard = () => {
             <Home className="mr-2 h-4 w-4" /> Back to Home
           </Button>
         </div>
-        {activeTab === 'orders' ? <AdminOrders /> : <AdminMenu />}
+        {activeTab === 'orders' && <AdminOrders />}
+        {activeTab === 'menu' && <AdminMenu />}
+        {activeTab === 'stripe' && <AdminStripeSettings />}
       </main>
     </div>
   );

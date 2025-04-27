@@ -2,11 +2,11 @@
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Menu, LogOut } from 'lucide-react';
+import { ClipboardList, Menu, LogOut, CreditCard } from 'lucide-react';
 
 interface AdminSidebarProps {
-  activeTab: 'orders' | 'menu';
-  onTabChange: (tab: 'orders' | 'menu') => void;
+  activeTab: 'orders' | 'menu' | 'stripe';
+  onTabChange: (tab: 'orders' | 'menu' | 'stripe') => void;
 }
 
 const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
@@ -35,6 +35,14 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
         >
           <Menu className="mr-2 h-4 w-4" />
           Menu
+        </Button>
+        <Button
+          variant={activeTab === 'stripe' ? 'default' : 'ghost'}
+          className="w-full justify-start"
+          onClick={() => onTabChange('stripe')}
+        >
+          <CreditCard className="mr-2 h-4 w-4" />
+          Stripe Settings
         </Button>
       </div>
       <div className="absolute bottom-4 w-56">
