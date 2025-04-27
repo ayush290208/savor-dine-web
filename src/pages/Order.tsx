@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -11,9 +10,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { CreditCard, Truck, Package, MapPin, Cash } from 'lucide-react';
+import { CreditCard, Truck, Package, MapPin, Banknote } from 'lucide-react';
 
-// Define MenuItem interface
 interface MenuItem {
   id: number;
   name: string;
@@ -24,7 +22,6 @@ interface MenuItem {
   quantity?: number;
 }
 
-// Sample menu data - in a real app, this would come from the database
 const menuItems: MenuItem[] = [
   {
     id: 1,
@@ -67,7 +64,6 @@ const OrderPage = () => {
   const [loading, setLoading] = useState(false);
   const [stripeInfo, setStripeInfo] = useState<{enabled: boolean, publishableKey: string} | null>(null);
 
-  // Fetch Stripe settings when component mounts
   useState(() => {
     fetchStripeSettings();
   });
@@ -92,7 +88,6 @@ const OrderPage = () => {
           publishableKey: settings.publishableKey || ''
         });
         
-        // If Stripe is not enabled, default to cash payment
         if (!settings.enabled) {
           setPaymentMethod('cash');
         }
@@ -101,13 +96,11 @@ const OrderPage = () => {
       console.error('Error processing Stripe settings:', error);
     }
   };
-  
+
   const addToCart = (item: MenuItem) => {
-    // Check if item is already in cart
     const itemInCart = cart.find(cartItem => cartItem.id === item.id);
     
     if (itemInCart) {
-      // Update quantity
       const updatedCart = cart.map(cartItem => 
         cartItem.id === item.id 
           ? { ...cartItem, quantity: (cartItem.quantity || 1) + 1 } 
@@ -115,7 +108,6 @@ const OrderPage = () => {
       );
       setCart(updatedCart);
     } else {
-      // Add new item with quantity 1
       setCart([...cart, { ...item, quantity: 1 }]);
     }
     
@@ -124,12 +116,12 @@ const OrderPage = () => {
       description: `${item.name} added to your order.`
     });
   };
-  
+
   const removeFromCart = (itemId: number) => {
     const updatedCart = cart.filter(item => item.id !== itemId);
     setCart(updatedCart);
   };
-  
+
   const updateQuantity = (itemId: number, quantity: number) => {
     if (quantity < 1) return;
     
@@ -138,18 +130,17 @@ const OrderPage = () => {
     );
     setCart(updatedCart);
   };
-  
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setCustomerInfo({ ...customerInfo, [name]: value });
   };
-  
+
   const calculateTotal = () => {
     return cart.reduce((total, item) => total + (item.price * (item.quantity || 1)), 0);
   };
-  
+
   const handleSubmitOrder = async () => {
-    // Validate customer info
     if (!customerInfo.name || !customerInfo.phone || (deliveryMethod === 'delivery' && !customerInfo.address)) {
       toast({
         title: "Missing information",
@@ -171,7 +162,6 @@ const OrderPage = () => {
     setLoading(true);
     
     try {
-      // Create order in database
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -186,10 +176,9 @@ const OrderPage = () => {
       
       if (orderError) throw orderError;
       
-      // Add order items
       const orderItems = cart.map(item => ({
         order_id: orderData.id,
-        menu_item_id: String(item.id), // Convert to string if your DB expects UUID
+        menu_item_id: String(item.id),
         quantity: item.quantity || 1,
         price_at_purchase: item.price,
         notes: customerInfo.notes
@@ -201,15 +190,10 @@ const OrderPage = () => {
       
       if (itemsError) throw itemsError;
       
-      // Handle payment method
       if (paymentMethod === 'stripe' && stripeInfo?.enabled) {
-        // In a real app, you would redirect to a Stripe checkout page or show a payment form
-        // This is a simplified example - you'd need to implement a proper Stripe integration
         alert('In a real implementation, you would be redirected to Stripe payment page');
-        // Redirect to thank you page after payment
         navigate('/order-confirmation');
       } else {
-        // For cash payment, just show confirmation
         navigate('/order-confirmation');
       }
     } catch (error: any) {
@@ -222,7 +206,7 @@ const OrderPage = () => {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -233,7 +217,6 @@ const OrderPage = () => {
         </h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Menu Items */}
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
@@ -267,7 +250,6 @@ const OrderPage = () => {
             </Card>
           </div>
           
-          {/* Order Summary */}
           <div>
             <div className="space-y-6">
               <Card>
@@ -373,7 +355,7 @@ const OrderPage = () => {
                       <div className="flex items-center space-x-2 border rounded-md p-3 hover:bg-muted/50 cursor-pointer">
                         <RadioGroupItem value="stripe" id="stripe" />
                         <Label htmlFor="stripe" className="flex items-center cursor-pointer flex-1">
-                          <CreditCard className="h-4 w-4 mr-2" />
+                          <CreditCard className="mr-2 h-4 w-4" />
                           <div>
                             <div>Credit Card</div>
                             <p className="text-sm text-muted-foreground">Pay securely via Stripe</p>
@@ -384,7 +366,7 @@ const OrderPage = () => {
                     <div className="flex items-center space-x-2 border rounded-md p-3 hover:bg-muted/50 cursor-pointer">
                       <RadioGroupItem value="cash" id="cash" />
                       <Label htmlFor="cash" className="flex items-center cursor-pointer flex-1">
-                        <Cash className="h-4 w-4 mr-2" />
+                        <Banknote className="mr-2 h-4 w-4" />
                         <div>
                           <div>Cash on Delivery</div>
                           <p className="text-sm text-muted-foreground">Pay when your order arrives</p>
