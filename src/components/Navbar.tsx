@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { PhoneCall } from "lucide-react";
+import { PhoneCall, Leaf } from "lucide-react";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -24,8 +23,9 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
-          <a href="#" className="text-2xl font-serif font-bold text-restaurant-dark">
-            SavorDine
+          <a href="#" className="flex items-center text-2xl font-serif font-bold text-restaurant-primary">
+            <Leaf className="w-6 h-6 mr-2" />
+            Garden Café
           </a>
 
           {/* Desktop Navigation */}
@@ -60,20 +60,18 @@ const Navbar = () => {
         </div>
         
         {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-white absolute top-full left-0 w-full shadow-md py-4 px-4 animate-fade-in">
-            <div className="flex flex-col space-y-4">
-              <a href="#home" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Home</a>
-              <a href="#menu" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Menu</a>
-              <a href="#about" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>About</a>
-              <a href="#gallery" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Gallery</a>
-              <a href="#contact" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Contact</a>
-              <Button className="bg-restaurant-primary hover:bg-restaurant-dark text-white w-full">
-                <PhoneCall className="w-4 h-4 mr-2" /> Reserve Table
-              </Button>
-            </div>
+        <div className={`md:hidden ${mobileMenuOpen ? 'block' : 'hidden'} bg-white absolute top-full left-0 w-full shadow-md py-4 px-4 animate-fade-in`}>
+          <div className="flex flex-col space-y-4">
+            <a href="#home" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Home</a>
+            <a href="#menu" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Menu</a>
+            <a href="#about" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>About</a>
+            <a href="#gallery" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Gallery</a>
+            <a href="#contact" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Contact</a>
+            <Button className="bg-restaurant-primary hover:bg-restaurant-dark text-white w-full">
+              <PhoneCall className="w-4 h-4 mr-2" /> Reserve Table
+            </Button>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );
