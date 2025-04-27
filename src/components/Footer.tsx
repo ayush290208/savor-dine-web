@@ -43,6 +43,26 @@ const Footer = () => {
     }
   };
 
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email) {
+      toast({
+        title: "Email is required",
+        description: "Please enter your email address.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    toast({
+      title: "Thank you for subscribing!",
+      description: "You'll receive our newsletters with exclusive offers.",
+    });
+    
+    setEmail("");
+  };
+
   const currentYear = new Date().getFullYear();
 
   return (
