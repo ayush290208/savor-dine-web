@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
-import { Facebook, Instagram, PhoneCall, ShoppingCart, LogIn } from "lucide-react";
+import { Facebook, Instagram, PhoneCall, ShoppingCart, LogIn, Link } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
@@ -145,6 +145,12 @@ const Footer = () => {
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
               <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
+              <a 
+                href="/admin" 
+                className="flex items-center hover:text-white transition-colors"
+              >
+                <Link className="mr-2 h-4 w-4" /> Admin Dashboard
+              </a>
               <Button 
                 variant="ghost" 
                 size="sm" 
