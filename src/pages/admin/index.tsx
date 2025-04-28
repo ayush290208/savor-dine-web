@@ -8,10 +8,11 @@ import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminOrders from '@/components/admin/AdminOrders';
 import AdminMenu from '@/components/admin/AdminMenu';
 import AdminStripeSettings from '@/components/admin/AdminStripeSettings';
+import AdminMapsSettings from '@/components/admin/AdminMapsSettings';
 import { toast } from '@/components/ui/use-toast';
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'stripe'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'stripe' | 'maps'>('orders');
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -61,6 +62,7 @@ const AdminDashboard = () => {
         {activeTab === 'orders' && <AdminOrders />}
         {activeTab === 'menu' && <AdminMenu />}
         {activeTab === 'stripe' && <AdminStripeSettings />}
+        {activeTab === 'maps' && <AdminMapsSettings />}
       </main>
     </div>
   );

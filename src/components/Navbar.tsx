@@ -1,10 +1,13 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { PhoneCall, Leaf } from "lucide-react";
+import { Menu, ShoppingCart } from "lucide-react";
+import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +18,10 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const viewMenu = () => {
+    navigate('/order');
+  };
+
   return (
     <nav 
       className={`fixed w-full z-50 transition-all duration-300 ${
@@ -23,24 +30,27 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
-          <a href="#" className="flex items-center text-2xl font-serif font-bold text-restaurant-primary">
-            <Leaf className="w-6 h-6 mr-2" />
+          <Link to="/" className="flex items-center text-2xl font-serif font-bold text-restaurant-primary">
+            <Menu className="w-6 h-6 mr-2" />
             Garden Café
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#home" className="font-medium hover:text-restaurant-primary transition-colors">Home</a>
-            <a href="#menu" className="font-medium hover:text-restaurant-primary transition-colors">Menu</a>
-            <a href="#about" className="font-medium hover:text-restaurant-primary transition-colors">About</a>
-            <a href="#gallery" className="font-medium hover:text-restaurant-primary transition-colors">Gallery</a>
-            <a href="#contact" className="font-medium hover:text-restaurant-primary transition-colors">Contact</a>
+            <Link to="/#home" className="font-medium hover:text-restaurant-primary transition-colors">Home</Link>
+            <Link to="/#menu" className="font-medium hover:text-restaurant-primary transition-colors">Menu</Link>
+            <Link to="/#about" className="font-medium hover:text-restaurant-primary transition-colors">About</Link>
+            <Link to="/#gallery" className="font-medium hover:text-restaurant-primary transition-colors">Gallery</Link>
+            <Link to="/#contact" className="font-medium hover:text-restaurant-primary transition-colors">Contact</Link>
           </div>
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <Button className="bg-restaurant-primary hover:bg-restaurant-dark text-white">
-              <PhoneCall className="w-4 h-4 mr-2" /> Reserve Table
+            <Button 
+              className="bg-restaurant-primary hover:bg-restaurant-dark text-white"
+              onClick={viewMenu}
+            >
+              <ShoppingCart className="w-4 h-4 mr-2" /> View Menu
             </Button>
           </div>
 
@@ -62,13 +72,16 @@ const Navbar = () => {
         {/* Mobile Menu */}
         <div className={`md:hidden ${mobileMenuOpen ? 'block' : 'hidden'} bg-white absolute top-full left-0 w-full shadow-md py-4 px-4 animate-fade-in`}>
           <div className="flex flex-col space-y-4">
-            <a href="#home" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Home</a>
-            <a href="#menu" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Menu</a>
-            <a href="#about" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>About</a>
-            <a href="#gallery" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Gallery</a>
-            <a href="#contact" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Contact</a>
-            <Button className="bg-restaurant-primary hover:bg-restaurant-dark text-white w-full">
-              <PhoneCall className="w-4 h-4 mr-2" /> Reserve Table
+            <Link to="/#home" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+            <Link to="/#menu" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Menu</Link>
+            <Link to="/#about" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>About</Link>
+            <Link to="/#gallery" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Gallery</Link>
+            <Link to="/#contact" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
+            <Button className="bg-restaurant-primary hover:bg-restaurant-dark text-white w-full" onClick={() => {
+              setMobileMenuOpen(false);
+              navigate('/order');
+            }}>
+              <ShoppingCart className="w-4 h-4 mr-2" /> View Menu
             </Button>
           </div>
         </div>

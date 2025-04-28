@@ -1,8 +1,10 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ShoppingCart } from "lucide-react";
 
 // Menu item interface
 interface MenuItem {
@@ -68,6 +70,11 @@ const menuItems: MenuItem[] = [
 
 const MenuSection = () => {
   const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
+
+  const goToOrder = () => {
+    navigate('/order');
+  };
 
   return (
     <section id="menu" className="py-20 bg-restaurant-light">
@@ -89,32 +96,36 @@ const MenuSection = () => {
           
           <TabsContent value="all" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {menuItems.map((item) => (
-              <MenuItemCard key={item.id} item={item} />
+              <MenuItemCard key={item.id} item={item} onOrderClick={goToOrder} />
             ))}
           </TabsContent>
           
           <TabsContent value="starters" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {menuItems.filter(item => item.category === "starters").map((item) => (
-              <MenuItemCard key={item.id} item={item} />
+              <MenuItemCard key={item.id} item={item} onOrderClick={goToOrder} />
             ))}
           </TabsContent>
           
           <TabsContent value="mains" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {menuItems.filter(item => item.category === "mains").map((item) => (
-              <MenuItemCard key={item.id} item={item} />
+              <MenuItemCard key={item.id} item={item} onOrderClick={goToOrder} />
             ))}
           </TabsContent>
           
           <TabsContent value="desserts" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {menuItems.filter(item => item.category === "desserts").map((item) => (
-              <MenuItemCard key={item.id} item={item} />
+              <MenuItemCard key={item.id} item={item} onOrderClick={goToOrder} />
             ))}
           </TabsContent>
         </Tabs>
         
         <div className="text-center mt-12">
-          <Button size="lg" className="bg-restaurant-primary hover:bg-restaurant-dark text-white text-lg" onClick={() => setShowModal(true)}>
-            See Full Menu
+          <Button 
+            size="lg" 
+            className="bg-restaurant-primary hover:bg-restaurant-dark text-white text-lg"
+            onClick={goToOrder}
+          >
+            <ShoppingCart className="w-5 h-5 mr-2" /> Order Now
           </Button>
         </div>
       </div>
@@ -122,9 +133,9 @@ const MenuSection = () => {
   );
 };
 
-const MenuItemCard = ({ item }: { item: MenuItem }) => {
+const MenuItemCard = ({ item, onOrderClick }: { item: MenuItem, onOrderClick: () => void }) => {
   return (
-    <Card className="overflow-hidden transform transition-all hover:-translate-y-1 hover:shadow-lg">
+    <Card className="overflow-hidden transform transition-all hover:-translate-y-1 hover:shadow-lg cursor-pointer" onClick={onOrderClick}>
       <div className="h-48 overflow-hidden">
         <img 
           src={item.image} 
@@ -138,6 +149,13 @@ const MenuItemCard = ({ item }: { item: MenuItem }) => {
           <span className="font-medium text-restaurant-primary">${item.price.toFixed(2)}</span>
         </div>
         <p className="text-gray-600">{item.description}</p>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="mt-3 w-full border-restaurant-primary text-restaurant-primary hover:bg-restaurant-primary hover:text-white"
+        >
+          <ShoppingCart className="w-4 h-4 mr-2" /> Order Now
+        </Button>
       </CardContent>
     </Card>
   );

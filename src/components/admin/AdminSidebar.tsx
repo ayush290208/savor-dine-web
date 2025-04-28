@@ -1,58 +1,52 @@
 
-import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Menu, LogOut, CreditCard } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { ShoppingBag, CreditCard, Package, MapPin } from "lucide-react";
 
 interface AdminSidebarProps {
-  activeTab: 'orders' | 'menu' | 'stripe';
-  onTabChange: (tab: 'orders' | 'menu' | 'stripe') => void;
+  activeTab: string;
+  onTabChange: (tab: 'orders' | 'menu' | 'stripe' | 'maps') => void;
 }
 
 const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/admin/login');
-  };
-
   return (
-    <div className="w-64 bg-card border-r p-4">
-      <div className="space-y-2">
+    <div className="w-64 bg-muted border-r p-4 hidden md:block">
+      <div className="space-y-1">
+        <h2 className="text-xl font-bold mb-6 px-2">Admin Dashboard</h2>
+        
         <Button
-          variant={activeTab === 'orders' ? 'default' : 'ghost'}
+          variant={activeTab === 'orders' ? 'secondary' : 'ghost'}
           className="w-full justify-start"
           onClick={() => onTabChange('orders')}
         >
-          <ClipboardList className="mr-2 h-4 w-4" />
+          <ShoppingBag className="mr-2 h-4 w-4" />
           Orders
         </Button>
+        
         <Button
-          variant={activeTab === 'menu' ? 'default' : 'ghost'}
+          variant={activeTab === 'menu' ? 'secondary' : 'ghost'}
           className="w-full justify-start"
           onClick={() => onTabChange('menu')}
         >
-          <Menu className="mr-2 h-4 w-4" />
-          Menu
+          <Package className="mr-2 h-4 w-4" />
+          Menu Management
         </Button>
+        
         <Button
-          variant={activeTab === 'stripe' ? 'default' : 'ghost'}
+          variant={activeTab === 'stripe' ? 'secondary' : 'ghost'}
           className="w-full justify-start"
           onClick={() => onTabChange('stripe')}
         >
           <CreditCard className="mr-2 h-4 w-4" />
-          Stripe Settings
+          Payment Settings
         </Button>
-      </div>
-      <div className="absolute bottom-4 w-56">
+        
         <Button
-          variant="ghost"
-          className="w-full justify-start text-destructive"
-          onClick={handleLogout}
+          variant={activeTab === 'maps' ? 'secondary' : 'ghost'}
+          className="w-full justify-start"
+          onClick={() => onTabChange('maps')}
         >
-          <LogOut className="mr-2 h-4 w-4" />
-          Logout
+          <MapPin className="mr-2 h-4 w-4" />
+          Maps Settings
         </Button>
       </div>
     </div>

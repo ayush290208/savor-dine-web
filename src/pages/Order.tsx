@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import DeliveryMap from '@/components/DeliveryMap';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,8 +11,16 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { supabase } from '@/integrations/supabase/client';
-import { CreditCard, Truck, Package, MapPin, Banknote } from 'lucide-react';
+import { ShoppingCart, CreditCard, Truck, Package, MapPin, Banknote } from 'lucide-react';
 
 interface MenuItem {
   id: number;
@@ -74,6 +84,8 @@ const OrderPage = () => {
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'cash'>('stripe');
   const [loading, setLoading] = useState(false);
   const [stripeInfo, setStripeInfo] = useState<StripeSettings | null>(null);
+  const [showMapDialog, setShowMapDialog] = useState(false);
+  const [activeTab, setActiveTab] = useState<'starters' | 'mains' | 'desserts' | 'all'>('all');
 
   const fetchStripeSettings = async () => {
     try {
@@ -156,6 +168,15 @@ const OrderPage = () => {
     return cart.reduce((total, item) => total + (item.price * (item.quantity || 1)), 0);
   };
 
+  const handleAddressSelect = (address: string) => {
+    setCustomerInfo({ ...customerInfo, address });
+    setShowMapDialog(false);
+  };
+
+  const openMapDialog = () => {
+    setShowMapDialog(true);
+  };
+
   const handleSubmitOrder = async () => {
     if (!customerInfo.name || !customerInfo.phone || (deliveryMethod === 'delivery' && !customerInfo.address)) {
       toast({
@@ -207,8 +228,14 @@ const OrderPage = () => {
       if (itemsError) throw itemsError;
       
       if (paymentMethod === 'stripe' && stripeInfo?.enabled) {
-        alert('In a real implementation, you would be redirected to Stripe payment page');
-        navigate('/order-confirmation');
+        toast({
+          title: "Processing Payment",
+          description: "Redirecting to payment page..."
+        });
+        // In a real implementation, you would redirect to Stripe payment page
+        setTimeout(() => {
+          navigate('/order-confirmation');
+        }, 1500);
       } else {
         navigate('/order-confirmation');
       }
@@ -223,40 +250,53 @@ const OrderPage = () => {
     }
   };
 
+  const filteredMenuItems = activeTab === 'all' 
+    ? menuItems 
+    : menuItems.filter(item => item.category === activeTab);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <div className="flex-grow container mx-auto px-4 py-12">
+      <div className="flex-grow container mx-auto px-4 py-12 mt-16">
         <h1 className="text-3xl md:text-4xl font-serif font-bold text-restaurant-dark mb-8 text-center">
-          Place Your Order
+          Order Delicious Food
         </h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <Card>
+            <Card className="mb-8">
               <CardHeader>
-                <CardTitle>Our Menu</CardTitle>
+                <CardTitle>Menu Categories</CardTitle>
               </CardHeader>
               <CardContent>
+                <Tabs defaultValue="all" value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
+                  <TabsList className="mb-4 w-full justify-start overflow-auto">
+                    <TabsTrigger value="all" className="px-4">All Items</TabsTrigger>
+                    <TabsTrigger value="starters" className="px-4">Starters</TabsTrigger>
+                    <TabsTrigger value="mains" className="px-4">Main Courses</TabsTrigger>
+                    <TabsTrigger value="desserts" className="px-4">Desserts</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+
                 <div className="space-y-4">
-                  {menuItems.map(item => (
-                    <div key={item.id} className="flex items-center gap-4 p-4 border rounded-md">
+                  {filteredMenuItems.map(item => (
+                    <div key={item.id} className="flex items-center gap-4 p-4 border rounded-md hover:shadow-md transition-shadow">
                       <img 
                         src={item.image} 
                         alt={item.name} 
-                        className="w-20 h-20 object-cover rounded-md"
+                        className="w-24 h-24 object-cover rounded-md"
                       />
                       <div className="flex-grow">
-                        <h3 className="font-medium">{item.name}</h3>
+                        <h3 className="font-medium text-lg">{item.name}</h3>
                         <p className="text-sm text-muted-foreground">{item.description}</p>
-                        <p className="font-medium">${item.price.toFixed(2)}</p>
+                        <p className="font-medium text-restaurant-primary mt-1">${item.price.toFixed(2)}</p>
                       </div>
                       <Button 
-                        variant="outline" 
+                        className="bg-restaurant-primary hover:bg-restaurant-dark flex-shrink-0"
                         onClick={() => addToCart(item)}
-                        className="flex-shrink-0"
                       >
+                        <ShoppingCart className="mr-2 h-4 w-4" />
                         Add to Order
                       </Button>
                     </div>
@@ -267,18 +307,24 @@ const OrderPage = () => {
           </div>
           
           <div>
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Order</CardTitle>
+            <div className="space-y-6 sticky top-24">
+              <Card className="shadow-md">
+                <CardHeader className="bg-restaurant-primary text-white rounded-t-lg">
+                  <CardTitle className="flex items-center">
+                    <ShoppingCart className="mr-2" />
+                    Your Order
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="max-h-[300px] overflow-y-auto">
                   {cart.length === 0 ? (
-                    <p className="text-muted-foreground">Your cart is empty</p>
+                    <div className="text-center py-6">
+                      <p className="text-muted-foreground">Your cart is empty</p>
+                      <p className="text-sm mt-2">Add items from our menu to start your order</p>
+                    </div>
                   ) : (
                     <div className="space-y-4">
                       {cart.map(item => (
-                        <div key={item.id} className="flex items-center justify-between">
+                        <div key={item.id} className="flex items-center justify-between border-b pb-3">
                           <div className="flex-1">
                             <p className="font-medium">{item.name}</p>
                             <p className="text-sm text-muted-foreground">${item.price.toFixed(2)}</p>
@@ -315,11 +361,22 @@ const OrderPage = () => {
                     </div>
                   )}
                 </CardContent>
-                <CardFooter className="flex flex-col items-stretch border-t pt-4">
-                  <div className="flex justify-between mb-4">
-                    <span className="font-medium">Total:</span>
-                    <span className="font-bold">${calculateTotal().toFixed(2)}</span>
+                <CardFooter className="flex flex-col items-stretch border-t pt-4 bg-muted/20">
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm text-muted-foreground">Subtotal:</span>
+                    <span className="font-medium">${calculateTotal().toFixed(2)}</span>
                   </div>
+                  <div className="flex justify-between mb-4">
+                    <span className="font-medium text-lg">Total:</span>
+                    <span className="font-bold text-lg text-restaurant-primary">${calculateTotal().toFixed(2)}</span>
+                  </div>
+                  <Button 
+                    onClick={handleSubmitOrder} 
+                    className="w-full bg-restaurant-primary hover:bg-restaurant-dark"
+                    disabled={loading || cart.length === 0}
+                  >
+                    {loading ? 'Processing...' : 'Pay Now & Complete Order'}
+                  </Button>
                 </CardFooter>
               </Card>
               
@@ -374,7 +431,7 @@ const OrderPage = () => {
                           <CreditCard className="mr-2 h-4 w-4" />
                           <div>
                             <div>Credit Card</div>
-                            <p className="text-sm text-muted-foreground">Pay securely via Stripe</p>
+                            <p className="text-sm text-muted-foreground">Pay securely online</p>
                           </div>
                         </Label>
                       </div>
@@ -434,7 +491,16 @@ const OrderPage = () => {
                     </div>
                     {deliveryMethod === 'delivery' && (
                       <div>
-                        <Label htmlFor="address">Delivery Address*</Label>
+                        <Label htmlFor="address" className="flex justify-between">
+                          Delivery Address*
+                          <Button 
+                            variant="link" 
+                            className="p-0 text-restaurant-primary h-auto" 
+                            onClick={openMapDialog}
+                          >
+                            Select on Map
+                          </Button>
+                        </Label>
                         <Input 
                           id="address" 
                           name="address" 
@@ -462,20 +528,23 @@ const OrderPage = () => {
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter>
-                  <Button 
-                    onClick={handleSubmitOrder} 
-                    className="w-full bg-restaurant-primary hover:bg-restaurant-dark"
-                    disabled={loading || cart.length === 0}
-                  >
-                    {loading ? 'Processing...' : 'Place Order'}
-                  </Button>
-                </CardFooter>
               </Card>
             </div>
           </div>
         </div>
       </div>
+      
+      <Dialog open={showMapDialog} onOpenChange={setShowMapDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Select Delivery Location</DialogTitle>
+            <DialogDescription>
+              Use the map to pinpoint your exact delivery location
+            </DialogDescription>
+          </DialogHeader>
+          <DeliveryMap onAddressSelect={handleAddressSelect} />
+        </DialogContent>
+      </Dialog>
       
       <Footer />
     </div>
