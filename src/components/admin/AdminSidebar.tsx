@@ -1,10 +1,10 @@
 
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, CreditCard, Package, MapPin } from "lucide-react";
+import { ShoppingBag, Package, MapPin } from "lucide-react";
 
 interface AdminSidebarProps {
   activeTab: string;
-  onTabChange: (tab: 'orders' | 'menu' | 'stripe' | 'maps') => void;
+  onTabChange: (tab: 'orders' | 'menu' | 'maps') => void;
 }
 
 const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
@@ -29,15 +29,6 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
         >
           <Package className="mr-2 h-4 w-4" />
           Menu Management
-        </Button>
-        
-        <Button
-          variant={activeTab === 'stripe' ? 'secondary' : 'ghost'}
-          className="w-full justify-start"
-          onClick={() => onTabChange('stripe')}
-        >
-          <CreditCard className="mr-2 h-4 w-4" />
-          Payment Settings
         </Button>
         
         <Button

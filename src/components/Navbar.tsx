@@ -2,12 +2,13 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Menu, ShoppingCart } from "lucide-react";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,6 +21,23 @@ const Navbar = () => {
 
   const viewMenu = () => {
     navigate('/order');
+  };
+  
+  // Function to handle smooth scrolling to sections on homepage
+  const scrollToSection = (sectionId: string) => {
+    if (location.pathname !== '/') {
+      navigate('/', { state: { scrollTo: sectionId } });
+      return;
+    }
+    
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    if (mobileMenuOpen) {
+      setMobileMenuOpen(false);
+    }
   };
 
   return (
@@ -37,11 +55,11 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/#home" className="font-medium hover:text-restaurant-primary transition-colors">Home</Link>
-            <Link to="/#menu" className="font-medium hover:text-restaurant-primary transition-colors">Menu</Link>
-            <Link to="/#about" className="font-medium hover:text-restaurant-primary transition-colors">About</Link>
-            <Link to="/#gallery" className="font-medium hover:text-restaurant-primary transition-colors">Gallery</Link>
-            <Link to="/#contact" className="font-medium hover:text-restaurant-primary transition-colors">Contact</Link>
+            <button onClick={() => scrollToSection('home')} className="font-medium hover:text-restaurant-primary transition-colors">Home</button>
+            <button onClick={() => scrollToSection('menu')} className="font-medium hover:text-restaurant-primary transition-colors">Menu</button>
+            <button onClick={() => scrollToSection('about')} className="font-medium hover:text-restaurant-primary transition-colors">About</button>
+            <button onClick={() => scrollToSection('gallery')} className="font-medium hover:text-restaurant-primary transition-colors">Gallery</button>
+            <button onClick={() => scrollToSection('contact')} className="font-medium hover:text-restaurant-primary transition-colors">Contact</button>
           </div>
 
           {/* CTA Button */}
@@ -72,11 +90,11 @@ const Navbar = () => {
         {/* Mobile Menu */}
         <div className={`md:hidden ${mobileMenuOpen ? 'block' : 'hidden'} bg-white absolute top-full left-0 w-full shadow-md py-4 px-4 animate-fade-in`}>
           <div className="flex flex-col space-y-4">
-            <Link to="/#home" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Home</Link>
-            <Link to="/#menu" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Menu</Link>
-            <Link to="/#about" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>About</Link>
-            <Link to="/#gallery" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Gallery</Link>
-            <Link to="/#contact" className="py-2 font-medium hover:text-restaurant-primary" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
+            <button onClick={() => scrollToSection('home')} className="py-2 font-medium hover:text-restaurant-primary">Home</button>
+            <button onClick={() => scrollToSection('menu')} className="py-2 font-medium hover:text-restaurant-primary">Menu</button>
+            <button onClick={() => scrollToSection('about')} className="py-2 font-medium hover:text-restaurant-primary">About</button>
+            <button onClick={() => scrollToSection('gallery')} className="py-2 font-medium hover:text-restaurant-primary">Gallery</button>
+            <button onClick={() => scrollToSection('contact')} className="py-2 font-medium hover:text-restaurant-primary">Contact</button>
             <Button className="bg-restaurant-primary hover:bg-restaurant-dark text-white w-full" onClick={() => {
               setMobileMenuOpen(false);
               navigate('/order');
