@@ -1,12 +1,11 @@
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 
 const AboutSection = () => {
   return (
     <section id="about" className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Image Side */}
           <div className="relative">
             <img 
@@ -39,65 +38,8 @@ const AboutSection = () => {
             </Button>
           </div>
         </div>
-
-        {/* Blog Section */}
-        <div className="mt-16">
-          <h2 className="text-3xl font-serif font-bold text-restaurant-dark text-center mb-12">Garden Café Blog</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <BlogCard 
-              title="Experience the Best of New American Cuisine with a Twist"
-              date="April 15, 2025"
-              image="public/lovable-uploads/736b4d75-282d-4f22-bf8d-cc5620769c86.png"
-              excerpt="Welcome to Garden Café Inwood, where culinary creativity meets familiar flavors. Nestled in a charming garden setting, our café presents a unique dining experience that combines new American dishes, refreshing cocktails, and a warm, inviting atmosphere."
-            />
-            
-            <BlogCard 
-              title="Celebrating Sustainable Dining Practices"
-              date="March 28, 2025"
-              image="https://images.unsplash.com/photo-1560341286-747b9461a8f9?q=80&w=1887&auto=format&fit=crop"
-              excerpt="At Garden Café, we believe in responsible dining. Learn how we're implementing eco-friendly practices, sourcing ingredients from local farmers, and reducing our environmental footprint while enhancing your dining experience."
-            />
-            
-            <BlogCard 
-              title="Behind the Scenes: Meet Our Culinary Team"
-              date="February 12, 2025"
-              image="https://images.unsplash.com/photo-1581299894007-aaa50297cf16?q=80&w=1887&auto=format&fit=crop"
-              excerpt="Get to know the talented chefs and culinary experts who bring passion and creativity to every dish at Garden Café. Their diverse backgrounds and shared commitment to excellence make our menu truly special."
-            />
-          </div>
-        </div>
       </div>
     </section>
-  );
-};
-
-interface BlogCardProps {
-  title: string;
-  date: string;
-  image: string;
-  excerpt: string;
-}
-
-const BlogCard = ({ title, date, image, excerpt }: BlogCardProps) => {
-  return (
-    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-      <div className="h-56 overflow-hidden">
-        <img 
-          src={image} 
-          alt={title} 
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-        />
-      </div>
-      <div className="p-6">
-        <p className="text-sm text-restaurant-primary font-medium mb-2">{date}</p>
-        <h3 className="font-serif font-bold text-xl text-restaurant-dark mb-3">{title}</h3>
-        <p className="text-gray-600 mb-4">{excerpt}</p>
-        <Button variant="link" className="text-restaurant-primary p-0 hover:text-restaurant-dark">
-          Read More
-        </Button>
-      </div>
-    </Card>
   );
 };
 
