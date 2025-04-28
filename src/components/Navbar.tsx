@@ -43,7 +43,7 @@ const Navbar = () => {
   return (
     <nav 
       className={`fixed w-full z-50 transition-all duration-300 ${
-        scrolled ? 'bg-white/95 backdrop-blur-sm shadow-md py-3' : 'bg-transparent py-5'
+        scrolled ? 'bg-white/95 backdrop-blur-sm shadow-md py-3' : 'bg-black/40 backdrop-blur-sm py-5'
       }`}
     >
       <div className="container mx-auto px-4">
@@ -55,17 +55,42 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <button onClick={() => scrollToSection('home')} className="font-medium hover:text-restaurant-primary transition-colors">Home</button>
-            <button onClick={() => scrollToSection('menu')} className="font-medium hover:text-restaurant-primary transition-colors">Menu</button>
-            <button onClick={() => scrollToSection('about')} className="font-medium hover:text-restaurant-primary transition-colors">About</button>
-            <button onClick={() => scrollToSection('gallery')} className="font-medium hover:text-restaurant-primary transition-colors">Gallery</button>
-            <button onClick={() => scrollToSection('contact')} className="font-medium hover:text-restaurant-primary transition-colors">Contact</button>
+            <button 
+              onClick={() => scrollToSection('home')} 
+              className="font-medium text-white hover:text-restaurant-primary transition-colors"
+            >
+              Home
+            </button>
+            <button 
+              onClick={() => scrollToSection('menu')} 
+              className="font-medium text-white hover:text-restaurant-primary transition-colors"
+            >
+              Menu
+            </button>
+            <button 
+              onClick={() => scrollToSection('about')} 
+              className="font-medium text-white hover:text-restaurant-primary transition-colors"
+            >
+              About
+            </button>
+            <button 
+              onClick={() => scrollToSection('gallery')} 
+              className="font-medium text-white hover:text-restaurant-primary transition-colors"
+            >
+              Gallery
+            </button>
+            <button 
+              onClick={() => scrollToSection('contact')} 
+              className="font-medium text-white hover:text-restaurant-primary transition-colors"
+            >
+              Contact
+            </button>
           </div>
 
           {/* CTA Button */}
           <div className="hidden md:block">
             <Button 
-              className="bg-restaurant-primary hover:bg-restaurant-dark text-white"
+              className="bg-restaurant-primary hover:bg-restaurant-dark text-white font-medium"
               onClick={viewMenu}
             >
               <ShoppingCart className="w-4 h-4 mr-2" /> View Menu
@@ -74,7 +99,7 @@ const Navbar = () => {
 
           {/* Mobile menu button */}
           <button 
-            className="md:hidden text-restaurant-dark p-2"
+            className="md:hidden text-white p-2"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">

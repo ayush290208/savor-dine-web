@@ -29,12 +29,17 @@ const HeroSection = () => {
             A serene oasis where nature meets culinary excellence
           </p>
           <div className="flex flex-wrap gap-4 animate-fade-in" style={{animationDelay: "0.4s"}}>
-            <Button asChild className="bg-restaurant-primary hover:bg-restaurant-dark text-white text-lg px-8 py-6">
+            <Button asChild size="lg" className="bg-restaurant-primary hover:bg-restaurant-dark text-white text-lg px-8 py-6">
               <Link to="/order">
                 <ShoppingCart className="w-5 h-5 mr-2" /> Order Online
               </Link>
             </Button>
-            <Button asChild variant="outline" className="border-white text-white hover:bg-white/10 text-lg px-8 py-6">
+            <Button 
+              asChild 
+              variant="outline" 
+              size="lg"
+              className="border-white text-white hover:bg-white/10 text-lg px-8 py-6"
+            >
               <a href="#menu">View Menu</a>
             </Button>
           </div>
